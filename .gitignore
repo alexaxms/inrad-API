@@ -1,0 +1,7 @@
+.idea
+db.sqlite3
+__pycache__/
+.pytest_cache
+.coverage
+.DS_Store
+htmlcov
