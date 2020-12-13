@@ -19,7 +19,7 @@ class User(AbstractUser):
 
 
 class Role(models.Model):
-    name = models.CharField(unique=True)
+    name = models.CharField(unique=True, max_length=40)
 
 
 class RoleUser(models.Model):
