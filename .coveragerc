@@ -1,0 +1,11 @@
+[run]
+omit =*/site-packages/*
+    */distutils/*
+    */tests/*
+    */migrations/*
+    manage.py
+    */apps.py
+    */__init__.py
+    inrad/wsgi.py
+    inrad/asgi.py
+    inrad/urls.py
