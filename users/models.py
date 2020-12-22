@@ -10,6 +10,7 @@ class User(AbstractUser):
     )
     email = models.EmailField(unique=True)
     user_type = models.CharField(max_length=10, choices=USER_TYPES, default='Employee')
+    roles = models.ManyToManyField('Role')
 
     REQUIRED_FIELDS = ('first_name', 'last_name', 'email', 'user_type')
 
@@ -20,8 +21,3 @@ class User(AbstractUser):
 
 class Role(models.Model):
     name = models.CharField(unique=True, max_length=40)
-
-
-class RoleUser(models.Model):
-    user = models.ForeignKey(User, related_name="user_roles", on_delete=models.CASCADE)
-    role = models.ForeignKey(Role, related_name="role_users", on_delete=models.CASCADE)
