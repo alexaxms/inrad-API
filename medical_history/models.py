@@ -1,3 +1,4 @@
+import pika
 from django.db import models
 
 from users.models import User
@@ -5,8 +6,8 @@ from users.models import User
 
 class Patient(models.Model):
     GENDER = (
-        ("Hombre", "Hombre"),
-        ("Mujer", "Mujer"),
+        ("Masculino", "Masculino"),
+        ("Femenino", "Femenino"),
     )
     name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
@@ -61,6 +62,18 @@ class TreatmentSession(models.Model):
     patient = models.ForeignKey(Patient, related_name="treatment_sessions", on_delete=models.DO_NOTHING)
     patient_treatment = models.ForeignKey(Treatment, related_name="treatment_sessions", on_delete=models.DO_NOTHING)
     disease = models.ForeignKey(Disease, related_name="treatment_sessions", on_delete=models.DO_NOTHING)
+
+    def save(self, *args, **kwargs):
+        super(TreatmentSession, self).save(*args, **kwargs)
+        connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+        channel = connection.channel()
+        channel.queue_declare(queue='sessions')
+        for i in range(100):
+            channel.basic_publish(exchange='',
+                                  routing_key='hello',
+                                  body=self.summary)
+        print(" [x] Sent 'Hello World!'")
+        connection.close()
 
 
 class TreatmentSessionImage(models.Model):
