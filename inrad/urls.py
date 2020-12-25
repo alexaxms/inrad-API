@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework_nested import routers
 
-from medical_history.views import AppointmentViewSet, PatientViewSet
+from medical_history.views import AppointmentViewSet, PatientViewSet, TreatmentSessionViewSet
 
 router = routers.SimpleRouter()
 router.register('patients', PatientViewSet)
@@ -15,6 +15,11 @@ patient_router.register(
     r'appointments',
     AppointmentViewSet,
     basename='patient-appointments'
+)
+patient_router.register(
+    r'treatment_session',
+    TreatmentSessionViewSet,
+    basename='patient-treatment_sessions'
 )
 
 urlpatterns = [
