@@ -18,6 +18,13 @@ class User(AbstractUser):
     def is_admin(self):
         return self.user_type == self.ADMIN
 
+    def to_dict(self) -> dict:
+        return {
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "role": self.roles.first().name if self.roles.first() else None
+        }
+
 
 class Role(models.Model):
     name = models.CharField(unique=True, max_length=40)

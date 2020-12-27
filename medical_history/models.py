@@ -12,6 +12,7 @@ class Patient(models.Model):
         ("Femenino", "Femenino"),
     )
     name = models.CharField(max_length=255)
+    identifier = models.CharField(max_length=13)
     last_name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=255)
     gender = models.CharField(max_length=20, choices=GENDER)
@@ -20,6 +21,18 @@ class Patient(models.Model):
 
     def __str__(self):
         return self.name
+
+    def to_dict(self) -> dict:
+        return {
+            "name": self.name,
+            "last_name": self.last_name,
+            "phone_number": self.phone_number,
+            "gender": self.gender,
+            "identifier": self.identifier,
+            "age": self.age,
+            "blood_type": self.blood_type,
+            "attachments": [attachment.to_dict() for attachment in self.attachments.all()]
+        }
 
 
 class PatientAttachmentData(models.Model):
@@ -30,6 +43,13 @@ class PatientAttachmentData(models.Model):
 
     def __str__(self):
         return self.name
+
+    def to_dict(self) -> dict:
+        return {
+            "name": self.name,
+            "description": self.description,
+            "img_link": self.link
+        }
 
 
 class Diagnostic(models.Model):
@@ -85,12 +105,39 @@ class Disease(models.Model):
     def __str__(self):
         return self.name
 
+    def to_dict(self) -> dict:
+        return {
+            "name": self.name,
+            "type": self.type.name,
+            "stage": self.stage.name
+        }
+
+
+class PatientTreatment(models.Model):
+    start_date = models.DateField()
+    end_date = models.DateField(null=True, default=None)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    treatment = models.ForeignKey(Treatment, on_delete=models.CASCADE)
+    success = models.BooleanField(null=True, default=None)
+
+    def __str__(self):
+        return f'{self.patient.name} {self.treatment.name}'
+
+    def to_dict(self) -> dict:
+        return {
+            "start_date": str(self.start_date),
+            "end_date": str(self.end_date) if self.end_date else None,
+            "treatment_name": self.treatment.name,
+            "success": self.success
+        }
+
 
 class TreatmentSession(models.Model):
     summary = models.TextField()
     user = models.ForeignKey(User, related_name="treatment_sessions", on_delete=models.DO_NOTHING)
     patient = models.ForeignKey(Patient, related_name="treatment_sessions", on_delete=models.DO_NOTHING)
-    patient_treatment = models.ForeignKey(Treatment, related_name="treatment_sessions", on_delete=models.DO_NOTHING)
+    patient_treatment = models.ForeignKey(PatientTreatment, related_name="treatment_sessions",
+                                          on_delete=models.DO_NOTHING)
     disease = models.ForeignKey(Disease, related_name="treatment_sessions", on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -108,17 +155,20 @@ class TreatmentSession(models.Model):
         channel.queue_declare(queue='inrad')
         channel.basic_publish(exchange='',
                               routing_key='inrad',
-                              body=json.dumps(self.send_treatment_session_body()))
+                              body=json.dumps(self.to_dict()))
         print(" [x] Sent to RabbitMQ")
         connection.close()
 
-    def send_treatment_session_body(self) -> dict:
+    def to_dict(self) -> dict:
         return {
+            "type": "SESSION",
             "summary": self.summary,
-            "user": self.user.first_name,
-            "patient": {},
-            "disease": self.disease.name,
-            "created_at": str(self.created_at)
+            "user": self.user.to_dict(),
+            "patient": self.patient.to_dict(),
+            "patient_treatment": self.patient_treatment.to_dict(),
+            "disease": self.disease.to_dict(),
+            "created_at": str(self.created_at),
+            "updated_at": str(self.updated_at)
         }
 
 
@@ -132,16 +182,12 @@ class TreatmentSessionImage(models.Model):
     def __str__(self):
         return self.name
 
-
-class PatientTreatment(models.Model):
-    start_date = models.DateField()
-    end_date = models.DateField(null=True, default=None)
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    treatment = models.ForeignKey(Treatment, on_delete=models.CASCADE)
-    success = models.BooleanField(null=True, default=None)
-
-    def __str__(self):
-        return f'{self.patient.name} {self.treatment.name}'
+    def to_dict(self) -> dict:
+        return {
+            "name": self.name,
+            "description": self.description,
+            "img_link": self.img_link
+        }
 
 
 class PatientDiagnostic(models.Model):
@@ -152,18 +198,51 @@ class PatientDiagnostic(models.Model):
     def __str__(self):
         return f'{self.patient.name} {self.diagnostic.name}'
 
+    def to_dict(self) -> dict:
+        return {
+            "diagnostic_date": str(self.diagnostic_date),
+            "name": self.diagnostic.name,
+            "description": self.diagnostic.description
+        }
+
 
 class Appointment(models.Model):
     summary = models.TextField()
     user = models.ForeignKey(User, related_name="appointments", on_delete=models.DO_NOTHING)
     patient = models.ForeignKey(Patient, related_name="appointments", on_delete=models.DO_NOTHING)
     patient_diagnostic = models.ForeignKey(PatientDiagnostic, on_delete=models.DO_NOTHING)
-    patient_treatment = models.ForeignKey(PatientTreatment, on_delete=models.DO_NOTHING, null=True)
+    patient_treatment = models.ForeignKey(PatientTreatment, on_delete=models.DO_NOTHING, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        super(Appointment, self).save(*args, **kwargs)
+        self.send_treatment_session_to_rmq()
+
     def __str__(self):
         return f'{self.patient.name} - {str(self.created_at)}'
+
+    def send_treatment_session_to_rmq(self):
+        connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+        channel = connection.channel()
+        channel.queue_declare(queue='inrad')
+        channel.basic_publish(exchange='',
+                              routing_key='inrad',
+                              body=json.dumps(self.to_dict()))
+        print(" [x] Sent to RabbitMQ")
+        connection.close()
+
+    def to_dict(self) -> dict:
+        return {
+            "type": "APPOINTMENT",
+            "summary": self.summary,
+            "user": self.user.to_dict(),
+            "patient": self.patient.to_dict(),
+            "patient_treatment": self.patient_treatment.to_dict() if self.patient_treatment else None,
+            "diagnostic": self.patient_diagnostic.to_dict(),
+            "created_at": str(self.created_at),
+            "updated_at": str(self.updated_at)
+        }
 
 
 class MedicalAppointmentImage(models.Model):
@@ -175,3 +254,10 @@ class MedicalAppointmentImage(models.Model):
 
     def __str__(self):
         return self.name
+
+    def to_dict(self) -> dict:
+        return {
+            "name": self.name,
+            "description": self.description,
+            "img_link": self.img_link
+        }
