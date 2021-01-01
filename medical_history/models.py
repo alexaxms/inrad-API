@@ -1,4 +1,5 @@
 import json
+import os
 
 import pika
 from django.db import models
@@ -150,7 +151,7 @@ class TreatmentSession(models.Model):
         self.send_treatment_session_to_rmq()
 
     def send_treatment_session_to_rmq(self):
-        connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+        connection = pika.BlockingConnection(pika.ConnectionParameters(os.getenv("RABBIT_HOST")))
         channel = connection.channel()
         channel.queue_declare(queue='inrad')
         channel.basic_publish(exchange='',
@@ -223,7 +224,7 @@ class Appointment(models.Model):
         return f'{self.patient.name} - {str(self.created_at)}'
 
     def send_treatment_session_to_rmq(self):
-        connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+        connection = pika.BlockingConnection(pika.ConnectionParameters(os.getenv("RABBIT_HOST")))
         channel = connection.channel()
         channel.queue_declare(queue='inrad')
         channel.basic_publish(exchange='',
