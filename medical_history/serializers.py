@@ -1,8 +1,29 @@
 from rest_framework import serializers
 
 from medical_history.models import Appointment, Patient, PatientAttachmentData, PatientTreatment, TreatmentSession, \
-    Disease
+    Disease, DiseaseType, DiseaseStage
 from users.serializers import UserSerializer
+
+
+class DiseaseTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DiseaseType
+        fields = "__all__"
+
+
+class DiseaseStageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DiseaseStage
+        fields = "__all__"
+
+
+class DiseaseSerializer(serializers.ModelSerializer):
+    type = DiseaseTypeSerializer(read_only=True)
+    stage = DiseaseStageSerializer(read_only=True)
+
+    class Meta:
+        model = Disease
+        fields = "__all__"
 
 
 class PatientAttachmentDataSerializer(serializers.ModelSerializer):
@@ -17,6 +38,13 @@ class PatientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Patient
         fields = "__all__"
+
+    def create(self, validated_data):
+        attachments_data = validated_data.pop('attachments')
+        patient = Patient.objects.create(**validated_data)
+        for attachment in attachments_data:
+            PatientAttachmentData.objects.create(patient=patient, **attachment)
+        return patient
 
 
 class PatientTreatmentSerializer(serializers.ModelSerializer):
@@ -39,12 +67,6 @@ class AppointmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Appointment
-        fields = "__all__"
-
-
-class DiseaseSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Disease
         fields = "__all__"
 
 

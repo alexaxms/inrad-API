@@ -2,8 +2,9 @@ from django.http import Http404
 from rest_framework import mixins
 from rest_framework.viewsets import GenericViewSet
 
-from medical_history.models import Patient, Appointment
-from medical_history.serializers import AppointmentSerializer, PatientSerializer, TreatmentSessionSerializer
+from medical_history.models import Patient, Appointment, DiseaseType, DiseaseStage, Disease
+from medical_history.serializers import AppointmentSerializer, PatientSerializer, TreatmentSessionSerializer, \
+    DiseaseTypeSerializer, DiseaseStageSerializer, DiseaseSerializer
 
 
 class AppointmentViewSet(mixins.ListModelMixin,
@@ -48,3 +49,33 @@ class PatientViewSet(mixins.ListModelMixin,
                      GenericViewSet):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
+
+
+class DiseaseTypeViewSet(mixins.ListModelMixin,
+                         mixins.CreateModelMixin,
+                         mixins.RetrieveModelMixin,
+                         mixins.UpdateModelMixin,
+                         mixins.DestroyModelMixin,
+                         GenericViewSet):
+    queryset = DiseaseType.objects.all()
+    serializer_class = DiseaseTypeSerializer
+
+
+class DiseaseStageViewSet(mixins.ListModelMixin,
+                          mixins.CreateModelMixin,
+                          mixins.RetrieveModelMixin,
+                          mixins.UpdateModelMixin,
+                          mixins.DestroyModelMixin,
+                          GenericViewSet):
+    queryset = DiseaseStage.objects.all()
+    serializer_class = DiseaseStageSerializer
+
+
+class DiseaseViewSet(mixins.ListModelMixin,
+                     mixins.CreateModelMixin,
+                     mixins.RetrieveModelMixin,
+                     mixins.UpdateModelMixin,
+                     mixins.DestroyModelMixin,
+                     GenericViewSet):
+    queryset = Disease.objects.all()
+    serializer_class = DiseaseSerializer

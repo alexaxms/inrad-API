@@ -1,0 +1,39 @@
+version: "3.3"
+
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  web:
+    image: alexaxms/inrad-api:firsttry
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DB_NAME=postgres
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=db
+      - RABBIT_HOST=localhost
+      - PYTHONUNBUFFERED=1
+      - DJANGO_SUPERUSER_PASSWORD=admin
+      - DJANGO_SUPERUSER_USERNAME=admin
+      - DJANGO_SUPERUSER_EMAIL=admin@admin.com
+  app:
+    image: alexaxms/inrad-app
+    command: npm start
+    volumes:
+      - .:/code
+    ports:
+      - "3000:3000"
+    depends_on:
+      - web
+    environment:
+      - REACT_APP_API_HOST=0.0.0.0:8000

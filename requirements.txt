@@ -4,6 +4,7 @@ attrs==20.3.0
 coverage==5.3.1
 distlib==0.3.1
 Django==3.1.4
+django-cors-headers==3.6.0
 django-filter==2.4.0
 djangorestframework==3.12.2
 drf-nested-routers==0.92.5

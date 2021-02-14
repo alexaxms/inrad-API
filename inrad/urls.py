@@ -2,10 +2,14 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework_nested import routers
 
-from medical_history.views import AppointmentViewSet, PatientViewSet, TreatmentSessionViewSet
+from medical_history.views import AppointmentViewSet, PatientViewSet, TreatmentSessionViewSet, DiseaseViewSet, \
+    DiseaseTypeViewSet, DiseaseStageViewSet
 
 router = routers.SimpleRouter()
 router.register('patients', PatientViewSet)
+router.register('diseases', DiseaseViewSet)
+router.register('disease_types', DiseaseTypeViewSet)
+router.register('disease_stages', DiseaseStageViewSet)
 
 patient_router = routers.NestedSimpleRouter(
     router,
