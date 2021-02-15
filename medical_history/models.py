@@ -77,8 +77,16 @@ class Symptom(models.Model):
         return self.name
 
 
+class TreatmentCategory(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
 class Treatment(models.Model):
     name = models.CharField(max_length=255)
+    category = models.ForeignKey(TreatmentCategory, related_name="treatments", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

@@ -3,9 +3,10 @@ from rest_framework import mixins
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.viewsets import GenericViewSet
 
-from medical_history.models import Patient, Appointment, DiseaseType, DiseaseStage, Disease
+from medical_history.models import Patient, Appointment, DiseaseType, DiseaseStage, Disease, Treatment, \
+    TreatmentCategory
 from medical_history.serializers import AppointmentSerializer, PatientSerializer, TreatmentSessionSerializer, \
-    DiseaseTypeSerializer, DiseaseStageSerializer, DiseaseSerializer
+    DiseaseTypeSerializer, DiseaseStageSerializer, DiseaseSerializer, TreatmentSerializer, TreatmentCategorySerializer
 
 
 class AppointmentViewSet(mixins.ListModelMixin,
@@ -81,3 +82,27 @@ class DiseaseViewSet(mixins.ListModelMixin,
                      GenericViewSet):
     queryset = Disease.objects.all()
     serializer_class = DiseaseSerializer
+
+
+class TreatmentViewSet(mixins.ListModelMixin,
+                       mixins.CreateModelMixin,
+                       mixins.RetrieveModelMixin,
+                       mixins.UpdateModelMixin,
+                       mixins.DestroyModelMixin,
+                       GenericViewSet):
+    queryset = Treatment.objects.all()
+    serializer_class = TreatmentSerializer
+    filterset_fields = ["name"]
+    authentication_classes = [SessionAuthentication]
+
+
+class TreatmentCategoryViewSet(mixins.ListModelMixin,
+                               mixins.CreateModelMixin,
+                               mixins.RetrieveModelMixin,
+                               mixins.UpdateModelMixin,
+                               mixins.DestroyModelMixin,
+                               GenericViewSet):
+    queryset = TreatmentCategory.objects.all()
+    serializer_class = TreatmentCategorySerializer
+    filterset_fields = ["name"]
+    authentication_classes = [SessionAuthentication]

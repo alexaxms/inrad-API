@@ -24,7 +24,7 @@ class DetailUserSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "username", "first_name", "last_name", "email", "role")
+        fields = ("id", "username", "first_name", "last_name", "email", "role", "password")
 
     def validate_password(self, value: str) -> str:
         return make_password(value)
