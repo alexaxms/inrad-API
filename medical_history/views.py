@@ -1,5 +1,6 @@
 from django.http import Http404
 from rest_framework import mixins
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.viewsets import GenericViewSet
 
 from medical_history.models import Patient, Appointment, DiseaseType, DiseaseStage, Disease
@@ -49,6 +50,7 @@ class PatientViewSet(mixins.ListModelMixin,
                      GenericViewSet):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
+    authentication_classes = [SessionAuthentication]
 
 
 class DiseaseTypeViewSet(mixins.ListModelMixin,

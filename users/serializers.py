@@ -10,12 +10,21 @@ class RoleSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class UserSerializer(serializers.ModelSerializer):
-    roles = RoleSerializer(many=True)
+class DetailUserSerializer(serializers.ModelSerializer):
+    role = serializers.CharField(source='role.name', required=False)
 
     class Meta:
         model = User
-        fields = ("id", "username", "first_name", "last_name", "email", "roles")
+        fields = ("id", "username", "first_name", "last_name", "email", "role")
+
+    def validate_password(self, value: str) -> str:
+        return make_password(value)
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "username", "first_name", "last_name", "email", "role")
 
     def validate_password(self, value: str) -> str:
         return make_password(value)

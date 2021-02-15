@@ -4,7 +4,6 @@ import os
 from django.db import migrations
 
 
-
 class Migration(migrations.Migration):
     dependencies = [
         ('users', '0001_initial'),
@@ -13,9 +12,9 @@ class Migration(migrations.Migration):
     def generate_superuser(apps, schema_editor):
         from users.models import User
         superuser = User.objects.create_superuser(
-            username=os.environ.get('DJANGO_SUPERUSER_USERNAME'),
-            email=os.environ.get('DJANGO_SUPERUSER_EMAIL'),
-            password=os.environ.get('DJANGO_SUPERUSER_PASSWORD'))
+            username=os.environ.get('DJANGO_SUPERUSER_USERNAME', 'admin'),
+            email=os.environ.get('DJANGO_SUPERUSER_EMAIL', 'admin@admin.com'),
+            password=os.environ.get('DJANGO_SUPERUSER_PASSWORD', 'admin'))
 
         superuser.save()
 

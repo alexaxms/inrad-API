@@ -24,8 +24,6 @@ SECRET_KEY = 'uq98p@!yq_n%osc++s-aidw3hv%5u!ovd)fv)s3@col_qy20e$'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '104.236.52.233']
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -50,8 +48,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'inrad.urls'
@@ -73,7 +71,13 @@ TEMPLATES = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication'
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated'
+    ]
 }
 
 WSGI_APPLICATION = 'inrad.wsgi.application'
@@ -87,13 +91,13 @@ DATABASES = {
 
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
 
-        'NAME': os.getenv("DB_NAME"),
+        'NAME': os.getenv("DB_NAME", "postgres"),
 
-        'USER': os.getenv("DB_USERNAME"),
+        'USER': os.getenv("DB_USERNAME", "postgres"),
 
-        'PASSWORD': os.getenv("DB_PASSWORD"),
+        'PASSWORD': os.getenv("DB_PASSWORD", "postgres"),
 
-        'HOST': os.getenv("DB_HOST"),
+        'HOST': os.getenv("DB_HOST", "localhost"),
 
         'PORT': os.getenv("DB_PORT", 5432),
 
@@ -140,3 +144,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ALLOW_CREDENTIALS = True
