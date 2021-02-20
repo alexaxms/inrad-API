@@ -71,7 +71,6 @@ class SymptomGroup(models.Model):
 class Symptom(models.Model):
     name = models.CharField(max_length=255)
     group = models.ForeignKey(SymptomGroup, related_name="symptoms", on_delete=models.CASCADE)
-    diagnostic = models.ForeignKey(Diagnostic, related_name="symptoms", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

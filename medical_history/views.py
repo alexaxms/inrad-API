@@ -4,9 +4,10 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.viewsets import GenericViewSet
 
 from medical_history.models import Patient, Appointment, DiseaseType, DiseaseStage, Disease, Treatment, \
-    TreatmentCategory
+    TreatmentCategory, SymptomGroup, Symptom
 from medical_history.serializers import AppointmentSerializer, PatientSerializer, TreatmentSessionSerializer, \
-    DiseaseTypeSerializer, DiseaseStageSerializer, DiseaseSerializer, TreatmentSerializer, TreatmentCategorySerializer
+    DiseaseTypeSerializer, DiseaseStageSerializer, DiseaseSerializer, TreatmentSerializer, TreatmentCategorySerializer, \
+    DetailTreatmentSerializer, SymptomGroupSerializer, SymptomSerializer, DetailSymptomSerializer
 
 
 class AppointmentViewSet(mixins.ListModelMixin,
@@ -95,6 +96,11 @@ class TreatmentViewSet(mixins.ListModelMixin,
     filterset_fields = ["name"]
     authentication_classes = [SessionAuthentication]
 
+    def get_serializer_class(self):
+        if self.action == 'retrieve' or self.action == 'list':
+            return DetailTreatmentSerializer
+        return TreatmentSerializer
+
 
 class TreatmentCategoryViewSet(mixins.ListModelMixin,
                                mixins.CreateModelMixin,
@@ -106,3 +112,31 @@ class TreatmentCategoryViewSet(mixins.ListModelMixin,
     serializer_class = TreatmentCategorySerializer
     filterset_fields = ["name"]
     authentication_classes = [SessionAuthentication]
+
+
+class SymptomGroupViewSet(mixins.ListModelMixin,
+                          mixins.CreateModelMixin,
+                          mixins.RetrieveModelMixin,
+                          mixins.UpdateModelMixin,
+                          mixins.DestroyModelMixin,
+                          GenericViewSet):
+    queryset = SymptomGroup.objects.all()
+    serializer_class = SymptomGroupSerializer
+    filterset_fields = ["name"]
+    authentication_classes = [SessionAuthentication]
+
+
+class SymptomViewSet(mixins.ListModelMixin,
+                     mixins.CreateModelMixin,
+                     mixins.RetrieveModelMixin,
+                     mixins.UpdateModelMixin,
+                     mixins.DestroyModelMixin,
+                     GenericViewSet):
+    queryset = Symptom.objects.all()
+    filterset_fields = ["name"]
+    authentication_classes = [SessionAuthentication]
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve' or self.action == 'list':
+            return DetailSymptomSerializer
+        return SymptomSerializer

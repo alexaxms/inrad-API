@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from medical_history.models import Appointment, Patient, PatientAttachmentData, PatientTreatment, TreatmentSession, \
-    Disease, DiseaseType, DiseaseStage, Treatment, TreatmentCategory
+    Disease, DiseaseType, DiseaseStage, Treatment, TreatmentCategory, SymptomGroup, Symptom
 from users.serializers import UserSerializer
 
 
@@ -91,3 +91,31 @@ class TreatmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Treatment
         fields = "__all__"
+
+
+class DetailTreatmentSerializer(serializers.ModelSerializer):
+    category = serializers.CharField(source='category.name', required=False)
+
+    class Meta:
+        model = Treatment
+        fields = ("id", "name", "category")
+
+
+class SymptomGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SymptomGroup
+        fields = "__all__"
+
+
+class SymptomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Symptom
+        fields = "__all__"
+
+
+class DetailSymptomSerializer(serializers.ModelSerializer):
+    group = serializers.CharField(source='group.name', required=False)
+
+    class Meta:
+        model = Symptom
+        fields = ("id", "name", "group")
