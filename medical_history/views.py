@@ -3,10 +3,10 @@ from rest_framework import mixins
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.viewsets import GenericViewSet
 
-from medical_history.models import Patient, Appointment, DiseaseType, DiseaseStage, Disease, Treatment, \
-    TreatmentCategory, SymptomGroup, Symptom
-from medical_history.serializers import AppointmentSerializer, PatientSerializer, TreatmentSessionSerializer, \
-    DiseaseTypeSerializer, DiseaseStageSerializer, DiseaseSerializer, TreatmentSerializer, TreatmentCategorySerializer, \
+from medical_history.models import Patient, Appointment, DiseaseType, Treatment, TreatmentCategory, SymptomGroup, \
+    Symptom
+from medical_history.serializers import AppointmentSerializer, PatientSerializer, \
+    DiseaseTypeSerializer, TreatmentSerializer, TreatmentCategorySerializer, \
     DetailTreatmentSerializer, SymptomGroupSerializer, SymptomSerializer, DetailSymptomSerializer
 
 
@@ -26,22 +26,6 @@ class AppointmentViewSet(mixins.ListModelMixin,
         except Appointment.DoesNotExist:
             raise Http404
 
-
-class TreatmentSessionViewSet(mixins.ListModelMixin,
-                              mixins.CreateModelMixin,
-                              mixins.RetrieveModelMixin,
-                              mixins.UpdateModelMixin,
-                              mixins.DestroyModelMixin,
-                              GenericViewSet):
-    serializer_class = TreatmentSessionSerializer
-    filterset_fields = ["user_id"]
-
-    def get_queryset(self):
-        try:
-            patient = Patient.objects.get(id=self.kwargs['patient_pk'])
-            return patient.treatment_sessions
-        except Appointment.DoesNotExist:
-            raise Http404
 
 
 class PatientViewSet(mixins.ListModelMixin,
@@ -63,26 +47,6 @@ class DiseaseTypeViewSet(mixins.ListModelMixin,
                          GenericViewSet):
     queryset = DiseaseType.objects.all()
     serializer_class = DiseaseTypeSerializer
-
-
-class DiseaseStageViewSet(mixins.ListModelMixin,
-                          mixins.CreateModelMixin,
-                          mixins.RetrieveModelMixin,
-                          mixins.UpdateModelMixin,
-                          mixins.DestroyModelMixin,
-                          GenericViewSet):
-    queryset = DiseaseStage.objects.all()
-    serializer_class = DiseaseStageSerializer
-
-
-class DiseaseViewSet(mixins.ListModelMixin,
-                     mixins.CreateModelMixin,
-                     mixins.RetrieveModelMixin,
-                     mixins.UpdateModelMixin,
-                     mixins.DestroyModelMixin,
-                     GenericViewSet):
-    queryset = Disease.objects.all()
-    serializer_class = DiseaseSerializer
 
 
 class TreatmentViewSet(mixins.ListModelMixin,

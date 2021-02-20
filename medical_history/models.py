@@ -53,14 +53,6 @@ class PatientAttachmentData(models.Model):
         }
 
 
-class Diagnostic(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.TextField()
-
-    def __str__(self):
-        return self.name
-
-
 class SymptomGroup(models.Model):
     name = models.CharField(max_length=255)
 
@@ -93,32 +85,11 @@ class Treatment(models.Model):
 
 class DiseaseType(models.Model):
     name = models.CharField(max_length=255)
+    code = models.CharField(max_length=255)
+    description = models.CharField(max_length=255, null=True)
 
     def __str__(self):
         return self.name
-
-
-class DiseaseStage(models.Model):
-    name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.name
-
-
-class Disease(models.Model):
-    name = models.CharField(max_length=255)
-    type = models.ForeignKey(DiseaseType, related_name="diseases", on_delete=models.CASCADE)
-    stage = models.ForeignKey(DiseaseStage, related_name="diseases", on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.name
-
-    def to_dict(self) -> dict:
-        return {
-            "name": self.name,
-            "type": self.type.name,
-            "stage": self.stage.name
-        }
 
 
 class PatientTreatment(models.Model):
@@ -140,78 +111,16 @@ class PatientTreatment(models.Model):
         }
 
 
-class TreatmentSession(models.Model):
-    summary = models.TextField()
-    user = models.ForeignKey(User, related_name="treatment_sessions", on_delete=models.DO_NOTHING)
-    patient = models.ForeignKey(Patient, related_name="treatment_sessions", on_delete=models.DO_NOTHING)
-    patient_treatment = models.ForeignKey(PatientTreatment, related_name="treatment_sessions",
-                                          on_delete=models.DO_NOTHING)
-    disease = models.ForeignKey(Disease, related_name="treatment_sessions", on_delete=models.DO_NOTHING)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f'{self.patient.name} - {str(self.created_at)}'
-
-    def save(self, *args, **kwargs):
-        super(TreatmentSession, self).save(*args, **kwargs)
-        self.send_treatment_session_to_rmq()
-
-    def send_treatment_session_to_rmq(self):
-        connection = pika.BlockingConnection(pika.ConnectionParameters(os.getenv("RABBIT_HOST")))
-        channel = connection.channel()
-        channel.queue_declare(queue='inrad')
-        channel.basic_publish(exchange='',
-                              routing_key='inrad',
-                              body=json.dumps(self.to_dict()))
-        print(" [x] Sent to RabbitMQ")
-        connection.close()
-
-    def to_dict(self) -> dict:
-        return {
-            "type": "SESSION",
-            "summary": self.summary,
-            "user": self.user.to_dict(),
-            "patient": self.patient.to_dict(),
-            "patient_treatment": self.patient_treatment.to_dict(),
-            "disease": self.disease.to_dict(),
-            "created_at": str(self.created_at),
-            "updated_at": str(self.updated_at)
-        }
-
-
-class TreatmentSessionImage(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.TextField()
-    img_link = models.URLField()
-    treatment_session = models.ForeignKey(TreatmentSession, related_name="images",
-                                          on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.name
-
-    def to_dict(self) -> dict:
-        return {
-            "name": self.name,
-            "description": self.description,
-            "img_link": self.img_link
-        }
-
-
 class PatientDiagnostic(models.Model):
     diagnostic_date = models.DateField()
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    diagnostic = models.ForeignKey(Diagnostic, on_delete=models.CASCADE)
+    disease_type = models.ForeignKey(DiseaseType, on_delete=models.CASCADE)
+    description = models.CharField(max_length=255, null=True)
+    disease_stage = models.IntegerField()
+    disease_aggressiveness = models.IntegerField()
 
     def __str__(self):
-        return f'{self.patient.name} {self.diagnostic.name}'
-
-    def to_dict(self) -> dict:
-        return {
-            "diagnostic_date": str(self.diagnostic_date),
-            "name": self.diagnostic.name,
-            "description": self.diagnostic.description
-        }
+        return f'{self.patient.name} {self.diagnostic_date}'
 
 
 class Appointment(models.Model):
@@ -225,7 +134,7 @@ class Appointment(models.Model):
 
     def save(self, *args, **kwargs):
         super(Appointment, self).save(*args, **kwargs)
-        self.send_treatment_session_to_rmq()
+        # self.send_treatment_session_to_rmq()
 
     def __str__(self):
         return f'{self.patient.name} - {str(self.created_at)}'
@@ -262,10 +171,3 @@ class MedicalAppointmentImage(models.Model):
 
     def __str__(self):
         return self.name
-
-    def to_dict(self) -> dict:
-        return {
-            "name": self.name,
-            "description": self.description,
-            "img_link": self.img_link
-        }
