@@ -10,12 +10,14 @@ class Migration(migrations.Migration):
     ]
 
     def generate_superuser(apps, schema_editor):
-        from users.models import User
+        from users.models import User, Role
+        admin_role = Role.objects.create(name="Admin")
         superuser = User.objects.create_superuser(
             username=os.environ.get('DJANGO_SUPERUSER_USERNAME', 'admin'),
             email=os.environ.get('DJANGO_SUPERUSER_EMAIL', 'admin@admin.com'),
-            password=os.environ.get('DJANGO_SUPERUSER_PASSWORD', 'admin'))
-
+            password=os.environ.get('DJANGO_SUPERUSER_PASSWORD', 'admin'),
+            role=admin_role
+        )
         superuser.save()
 
     operations = [

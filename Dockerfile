@@ -7,4 +7,4 @@ COPY . /inrad/
 RUN chmod +x /inrad/entrypoint.sh
 ENTRYPOINT ["/inrad/entrypoint.sh"]
 EXPOSE 8000
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["uwsgi", "--http", ":8000", "--ini", "./uwsgi.ini"]
