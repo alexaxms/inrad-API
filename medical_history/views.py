@@ -4,10 +4,12 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.viewsets import GenericViewSet
 
 from medical_history.models import Patient, Appointment, DiseaseType, Treatment, TreatmentCategory, SymptomGroup, \
-    Symptom
+    Symptom, TreatmentMachine, TreatmentMode, PatientDiagnostic, PatientTreatment, PatientAttachmentData
 from medical_history.serializers import AppointmentSerializer, PatientSerializer, \
     DiseaseTypeSerializer, TreatmentSerializer, TreatmentCategorySerializer, \
-    DetailTreatmentSerializer, SymptomGroupSerializer, SymptomSerializer, DetailSymptomSerializer
+    DetailTreatmentSerializer, SymptomGroupSerializer, SymptomSerializer, DetailSymptomSerializer, \
+    TreatmentMachineSerializer, TreatmentModeSerializer, PatientDiagnosticSerializer, PatientTreatmentSerializer, \
+    DetailPatientTreatmentSerializer, PatientAttachmentDataSerializer
 
 
 class AppointmentViewSet(mixins.ListModelMixin,
@@ -25,7 +27,6 @@ class AppointmentViewSet(mixins.ListModelMixin,
             return patient.appointments
         except Appointment.DoesNotExist:
             raise Http404
-
 
 
 class PatientViewSet(mixins.ListModelMixin,
@@ -47,6 +48,7 @@ class DiseaseTypeViewSet(mixins.ListModelMixin,
                          GenericViewSet):
     queryset = DiseaseType.objects.all()
     serializer_class = DiseaseTypeSerializer
+    authentication_classes = [SessionAuthentication]
 
 
 class TreatmentViewSet(mixins.ListModelMixin,
@@ -78,6 +80,30 @@ class TreatmentCategoryViewSet(mixins.ListModelMixin,
     authentication_classes = [SessionAuthentication]
 
 
+class TreatmentMachineViewSet(mixins.ListModelMixin,
+                              mixins.CreateModelMixin,
+                              mixins.RetrieveModelMixin,
+                              mixins.UpdateModelMixin,
+                              mixins.DestroyModelMixin,
+                              GenericViewSet):
+    queryset = TreatmentMachine.objects.all()
+    serializer_class = TreatmentMachineSerializer
+    filterset_fields = ["name"]
+    authentication_classes = [SessionAuthentication]
+
+
+class TreatmentModeViewSet(mixins.ListModelMixin,
+                           mixins.CreateModelMixin,
+                           mixins.RetrieveModelMixin,
+                           mixins.UpdateModelMixin,
+                           mixins.DestroyModelMixin,
+                           GenericViewSet):
+    queryset = TreatmentMode.objects.all()
+    serializer_class = TreatmentModeSerializer
+    filterset_fields = ["name"]
+    authentication_classes = [SessionAuthentication]
+
+
 class SymptomGroupViewSet(mixins.ListModelMixin,
                           mixins.CreateModelMixin,
                           mixins.RetrieveModelMixin,
@@ -104,3 +130,58 @@ class SymptomViewSet(mixins.ListModelMixin,
         if self.action == 'retrieve' or self.action == 'list':
             return DetailSymptomSerializer
         return SymptomSerializer
+
+
+class PatientDiagnosticViewSet(mixins.ListModelMixin,
+                               mixins.CreateModelMixin,
+                               mixins.RetrieveModelMixin,
+                               mixins.UpdateModelMixin,
+                               mixins.DestroyModelMixin,
+                               GenericViewSet):
+    authentication_classes = [SessionAuthentication]
+    serializer_class = PatientDiagnosticSerializer
+
+    def get_queryset(self):
+        attachments = PatientDiagnostic.objects.filter(patient_id=self.kwargs['patient_pk'])
+        return attachments.all()
+
+    def perform_create(self, serializer):
+        serializer.save(patient_id=self.kwargs['patient_pk'])
+
+
+class PatientTreatmentViewSet(mixins.ListModelMixin,
+                              mixins.CreateModelMixin,
+                              mixins.RetrieveModelMixin,
+                              mixins.UpdateModelMixin,
+                              mixins.DestroyModelMixin,
+                              GenericViewSet):
+    authentication_classes = [SessionAuthentication]
+
+    def get_queryset(self):
+        patient_diagnostics = PatientTreatment.objects.filter(patient_id=self.kwargs['patient_pk'])
+        return patient_diagnostics.all()
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve' or self.action == 'list':
+            return DetailPatientTreatmentSerializer
+        return PatientTreatmentSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(patient_id=self.kwargs['patient_pk'])
+
+
+class PatientAttachmentDataViewSet(mixins.ListModelMixin,
+                                   mixins.CreateModelMixin,
+                                   mixins.RetrieveModelMixin,
+                                   mixins.UpdateModelMixin,
+                                   mixins.DestroyModelMixin,
+                                   GenericViewSet):
+    authentication_classes = [SessionAuthentication]
+    serializer_class = PatientAttachmentDataSerializer
+
+    def get_queryset(self):
+        attachments = PatientAttachmentData.objects.filter(patient_id=self.kwargs['patient_pk'])
+        return attachments.all()
+
+    def perform_create(self, serializer):
+        serializer.save(patient_id=self.kwargs['patient_pk'])

@@ -75,6 +75,20 @@ class TreatmentCategory(models.Model):
         return self.name
 
 
+class TreatmentMode(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
+class TreatmentMachine(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
 class Treatment(models.Model):
     name = models.CharField(max_length=255)
     category = models.ForeignKey(TreatmentCategory, related_name="treatments", on_delete=models.CASCADE)
@@ -95,8 +109,10 @@ class DiseaseType(models.Model):
 class PatientTreatment(models.Model):
     start_date = models.DateField()
     end_date = models.DateField(null=True, default=None)
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    treatment = models.ForeignKey(Treatment, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, related_name="treatments", on_delete=models.CASCADE)
+    treatment = models.ForeignKey(Treatment, related_name="treatments", on_delete=models.CASCADE)
+    machine = models.ForeignKey(TreatmentMachine, related_name="treatments", on_delete=models.CASCADE)
+    mode = models.ForeignKey(TreatmentMode, related_name="treatments", on_delete=models.CASCADE)
     success = models.BooleanField(null=True, default=None)
 
     def __str__(self):
@@ -113,8 +129,8 @@ class PatientTreatment(models.Model):
 
 class PatientDiagnostic(models.Model):
     diagnostic_date = models.DateField()
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    disease_type = models.ForeignKey(DiseaseType, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, related_name="diagnostics", on_delete=models.CASCADE)
+    disease_type = models.ForeignKey(DiseaseType, related_name="diagnostics", on_delete=models.CASCADE)
     description = models.CharField(max_length=255, null=True)
     disease_stage = models.IntegerField()
     disease_aggressiveness = models.IntegerField()

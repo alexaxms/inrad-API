@@ -10,12 +10,13 @@ services:
       - POSTGRES_PASSWORD=postgres
     volumes:
       - pgdata:/var/lib/postgresql/data/
-  web:
-    build:
-      context: .
+    ports:
+      - "5432:5432"
+  inrad-api:
+    build: .
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - .:/code
+      - .:/inrad
     ports:
       - "8000:8000"
     depends_on:
@@ -24,14 +25,8 @@ services:
       ./.env-sample
     environment:
       - DB_HOST=db
-  app:
-    image: alexaxms/inrad-app
-    volumes:
-      - .:/code
-    ports:
-      - "80:80"
-    depends_on:
-      - web
+      - DJANGO_SETTINGS=dev
+      - DEBUG=True
 
 volumes:
   pgdata:
