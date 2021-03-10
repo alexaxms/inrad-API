@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: inrad-api
+  labels:
+    app: inrad-api
+spec:
+  ports:
+    - port: 8000
+      targetPort: 8000
+      nodePort: 30001
+  selector:
+    app: inrad-api
+    tier: backend
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inrad-api
+  labels:
+    app: inrad-api
+spec:
+  selector:
+    matchLabels:
+      app: inrad-api
+      tier: backend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: inrad-api
+        tier: backend
+    spec:
+      containers:
+        - image: <IMAGE>
+          name: inrad-api
+          env:
+            - name: DB_HOST
+              value: postgres-svc
+            - name: APP_HOST
+              value: http://inrad.musicmania.cl/
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: inrad-api-secret
+                  key: db_name
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: inrad-api-secret
+                  key: db_password
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: inrad-api-secret
+                  key: db_username
+            - name: RABBIT_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: inrad-api-secret
+                  key: rabbit_host
+            - name: PYTHONUNBUFFERED
+              valueFrom:
+                secretKeyRef:
+                  name: inrad-api-secret
+                  key: pythonunbuffered
+            - name: DJANGO_SUPERUSER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: inrad-api-secret
+                  key: django_superuser_password
+            - name: DJANGO_SUPERUSER_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: inrad-api-secret
+                  key: django_superuser_username
+            - name: DJANGO_SUPERUSER_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: inrad-api-secret
+                  key: django_superuser_email
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: inrad-api-secret
+                  key: secret_key
+          ports:
+            - containerPort: 8000
+              name: inrad-api
+          imagePullPolicy: Always

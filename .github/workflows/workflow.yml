@@ -1,0 +1,43 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Docker CI
+
+on:
+  push:
+    branches: [ master ]
+    
+jobs:
+  build:
+    name: Build, push, and deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Update SHA
+        run: echo $GITHUB_SHA > $GITHUB_WORKSPACE/_meta
+
+      - name: Docker login
+        run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Docker build
+        run: docker build -t alexaxms/inrad-api:$(echo $GITHUB_SHA | head -c7) .
+
+      - name: Docker push
+        run: docker push alexaxms/inrad-api:$(echo $GITHUB_SHA | head -c7)
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Update deployment file
+        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|alexaxms/inrad-api:'${TAG}'|' $GITHUB_WORKSPACE/k8s/deployment.yml
+
+      - name: Save DigitalOcean kubeconfig with short-lived credentials
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 inrad
+
+      - name: Deploy to DigitalOcean Kubernetes
+        run: kubectl apply -f $GITHUB_WORKSPACE/k8s/deployment.yml
+
+      - name: Verify deployment
+        run: kubectl rollout status deployment/inrad-api
