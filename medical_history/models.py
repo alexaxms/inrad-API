@@ -35,6 +35,14 @@ class Patient(models.Model):
             "attachments": [attachment.to_dict() for attachment in self.attachments.all()]
         }
 
+    @property
+    def current_treatment(self):
+        return self.treatments.last()
+
+    @property
+    def current_diagnostic(self):
+        return self.diagnostics.last()
+
 
 class PatientAttachmentData(models.Model):
     name = models.CharField(max_length=255)

@@ -9,7 +9,7 @@ from medical_history.serializers import AppointmentSerializer, PatientSerializer
     DiseaseTypeSerializer, TreatmentSerializer, TreatmentCategorySerializer, \
     DetailTreatmentSerializer, SymptomGroupSerializer, SymptomSerializer, DetailSymptomSerializer, \
     TreatmentMachineSerializer, TreatmentModeSerializer, PatientDiagnosticSerializer, PatientTreatmentSerializer, \
-    DetailPatientTreatmentSerializer, PatientAttachmentDataSerializer
+    DetailPatientTreatmentSerializer, PatientAttachmentDataSerializer, PatientDetailPatientDiagnosticSerializer
 
 
 class AppointmentViewSet(mixins.ListModelMixin,
@@ -139,7 +139,11 @@ class PatientDiagnosticViewSet(mixins.ListModelMixin,
                                mixins.DestroyModelMixin,
                                GenericViewSet):
     authentication_classes = [SessionAuthentication]
-    serializer_class = PatientDiagnosticSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve' or self.action == 'list':
+            return PatientDetailPatientDiagnosticSerializer
+        return PatientDiagnosticSerializer
 
     def get_queryset(self):
         attachments = PatientDiagnostic.objects.filter(patient_id=self.kwargs['patient_pk'])

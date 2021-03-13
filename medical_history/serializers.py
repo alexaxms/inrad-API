@@ -18,8 +18,6 @@ class PatientAttachmentDataSerializer(serializers.ModelSerializer):
 
 
 class PatientDiagnosticSerializer(serializers.ModelSerializer):
-    disease_type = DiseaseTypeSerializer()
-
     class Meta:
         model = PatientDiagnostic
         fields = ("diagnostic_date", "disease_type", "description", "disease_stage", "disease_aggressiveness", "id")
@@ -31,6 +29,14 @@ class PatientTreatmentSerializer(serializers.ModelSerializer):
         fields = ("start_date", "end_date", "treatment", "machine", "mode", "success", "id")
 
 
+class PatientDetailPatientDiagnosticSerializer(serializers.ModelSerializer):
+    disease_type = DiseaseTypeSerializer()
+
+    class Meta:
+        model = PatientDiagnostic
+        fields = "__all__"
+
+
 class PatientDetailPatientTreatmentSerializer(serializers.ModelSerializer):
     treatment = serializers.CharField(source='treatment.name')
     machine = serializers.CharField(source='machine.name')
@@ -40,10 +46,13 @@ class PatientDetailPatientTreatmentSerializer(serializers.ModelSerializer):
         model = PatientTreatment
         fields = "__all__"
 
+
 class PatientSerializer(serializers.ModelSerializer):
     attachments = PatientAttachmentDataSerializer(many=True)
-    diagnostics = PatientDiagnosticSerializer(many=True, read_only=True)
+    diagnostics = PatientDetailPatientDiagnosticSerializer(many=True, read_only=True)
     treatments = PatientDetailPatientTreatmentSerializer(many=True, read_only=True)
+    current_treatment = PatientDetailPatientTreatmentSerializer(read_only=True)
+    current_diagnostic = PatientDetailPatientDiagnosticSerializer(read_only=True)
 
     class Meta:
         model = Patient
