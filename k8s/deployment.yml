@@ -6,13 +6,12 @@ metadata:
     app: inrad-api
 spec:
   ports:
-    - port: 8000
+    - port: 80
       targetPort: 8000
-      nodePort: 30001
+      protocol: TCP
   selector:
     app: inrad-api
     tier: backend
-  type: NodePort
 ---
 apiVersion: apps/v1
 kind: Deployment
