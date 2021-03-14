@@ -1,6 +1,6 @@
 from django.http import Http404
 from rest_framework import mixins
-from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
 from medical_history.models import Patient, Appointment, DiseaseType, Treatment, TreatmentCategory, SymptomGroup, \
@@ -37,7 +37,7 @@ class PatientViewSet(mixins.ListModelMixin,
                      GenericViewSet):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
-    authentication_classes = [SessionAuthentication]
+    permission_classes = (IsAuthenticated,)
 
 
 class DiseaseTypeViewSet(mixins.ListModelMixin,
@@ -48,7 +48,7 @@ class DiseaseTypeViewSet(mixins.ListModelMixin,
                          GenericViewSet):
     queryset = DiseaseType.objects.all()
     serializer_class = DiseaseTypeSerializer
-    authentication_classes = [SessionAuthentication]
+    permission_classes = (IsAuthenticated,)
 
 
 class TreatmentViewSet(mixins.ListModelMixin,
@@ -60,7 +60,7 @@ class TreatmentViewSet(mixins.ListModelMixin,
     queryset = Treatment.objects.all()
     serializer_class = TreatmentSerializer
     filterset_fields = ["name"]
-    authentication_classes = [SessionAuthentication]
+    permission_classes = (IsAuthenticated,)
 
     def get_serializer_class(self):
         if self.action == 'retrieve' or self.action == 'list':
@@ -77,7 +77,7 @@ class TreatmentCategoryViewSet(mixins.ListModelMixin,
     queryset = TreatmentCategory.objects.all()
     serializer_class = TreatmentCategorySerializer
     filterset_fields = ["name"]
-    authentication_classes = [SessionAuthentication]
+    permission_classes = (IsAuthenticated,)
 
 
 class TreatmentMachineViewSet(mixins.ListModelMixin,
@@ -89,7 +89,7 @@ class TreatmentMachineViewSet(mixins.ListModelMixin,
     queryset = TreatmentMachine.objects.all()
     serializer_class = TreatmentMachineSerializer
     filterset_fields = ["name"]
-    authentication_classes = [SessionAuthentication]
+    permission_classes = (IsAuthenticated,)
 
 
 class TreatmentModeViewSet(mixins.ListModelMixin,
@@ -101,7 +101,7 @@ class TreatmentModeViewSet(mixins.ListModelMixin,
     queryset = TreatmentMode.objects.all()
     serializer_class = TreatmentModeSerializer
     filterset_fields = ["name"]
-    authentication_classes = [SessionAuthentication]
+    permission_classes = (IsAuthenticated,)
 
 
 class SymptomGroupViewSet(mixins.ListModelMixin,
@@ -113,7 +113,7 @@ class SymptomGroupViewSet(mixins.ListModelMixin,
     queryset = SymptomGroup.objects.all()
     serializer_class = SymptomGroupSerializer
     filterset_fields = ["name"]
-    authentication_classes = [SessionAuthentication]
+    permission_classes = (IsAuthenticated,)
 
 
 class SymptomViewSet(mixins.ListModelMixin,
@@ -124,7 +124,7 @@ class SymptomViewSet(mixins.ListModelMixin,
                      GenericViewSet):
     queryset = Symptom.objects.all()
     filterset_fields = ["name"]
-    authentication_classes = [SessionAuthentication]
+    permission_classes = (IsAuthenticated,)
 
     def get_serializer_class(self):
         if self.action == 'retrieve' or self.action == 'list':
@@ -138,7 +138,7 @@ class PatientDiagnosticViewSet(mixins.ListModelMixin,
                                mixins.UpdateModelMixin,
                                mixins.DestroyModelMixin,
                                GenericViewSet):
-    authentication_classes = [SessionAuthentication]
+    permission_classes = (IsAuthenticated,)
 
     def get_serializer_class(self):
         if self.action == 'retrieve' or self.action == 'list':
@@ -159,7 +159,7 @@ class PatientTreatmentViewSet(mixins.ListModelMixin,
                               mixins.UpdateModelMixin,
                               mixins.DestroyModelMixin,
                               GenericViewSet):
-    authentication_classes = [SessionAuthentication]
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         patient_diagnostics = PatientTreatment.objects.filter(patient_id=self.kwargs['patient_pk'])
@@ -180,7 +180,7 @@ class PatientAttachmentDataViewSet(mixins.ListModelMixin,
                                    mixins.UpdateModelMixin,
                                    mixins.DestroyModelMixin,
                                    GenericViewSet):
-    authentication_classes = [SessionAuthentication]
+    permission_classes = (IsAuthenticated,)
     serializer_class = PatientAttachmentDataSerializer
 
     def get_queryset(self):
