@@ -28,6 +28,13 @@ class AppointmentViewSet(mixins.ListModelMixin,
         except Appointment.DoesNotExist:
             raise Http404
 
+    def perform_create(self, serializer):
+        patient = Patient.objects.get(id=self.kwargs['patient_pk'])
+        treatment = patient.treatments.last()
+        diagnostic = patient.diagnostics.last()
+        serializer.save(patient_id=self.kwargs['patient_pk'], user_id=serializer.context['request'].user.id,
+                        patient_diagnostic=diagnostic, patient_treatment=treatment)
+
 
 class PatientViewSet(mixins.ListModelMixin,
                      mixins.CreateModelMixin,

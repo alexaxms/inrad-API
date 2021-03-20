@@ -1,6 +1,6 @@
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 
 from users.models import User, Role
 
@@ -32,6 +32,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class CustomJWTPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token['username'] = user.username
+        return token
+
+
+class CustomJWTRefreshSerializer(TokenRefreshSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)

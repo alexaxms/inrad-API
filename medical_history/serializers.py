@@ -67,10 +67,10 @@ class PatientSerializer(serializers.ModelSerializer):
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-    patient = PatientSerializer()
-    patient_diagnostic = PatientTreatmentSerializer()
-    patient_treatment = PatientDiagnosticSerializer()
+    user = UserSerializer(read_only=True)
+    patient = PatientSerializer(read_only=True)
+    patient_diagnostic = PatientTreatmentSerializer(read_only=True)
+    patient_treatment = PatientDiagnosticSerializer(read_only=True)
 
     class Meta:
         model = Appointment

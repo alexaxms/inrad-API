@@ -3,7 +3,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
 from users.models import User, Role
-from users.serializers import UserSerializer, RoleSerializer, DetailUserSerializer, CustomJWTPairSerializer
+from users.serializers import UserSerializer, RoleSerializer, DetailUserSerializer, CustomJWTPairSerializer, \
+    CustomJWTRefreshSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
@@ -40,4 +41,4 @@ class CustomJWTPairView(TokenObtainPairView):
 
 
 class CustomJWTRefreshView(TokenRefreshView):
-    serializer_class = CustomJWTPairSerializer
+    serializer_class = CustomJWTRefreshSerializer
