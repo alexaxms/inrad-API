@@ -1,8 +1,28 @@
 from rest_framework import serializers
 
-from medical_history.models import Appointment, Patient, PatientAttachmentData, PatientTreatment, \
-    DiseaseType, Treatment, TreatmentCategory, SymptomGroup, Symptom, TreatmentMachine, TreatmentMode, PatientDiagnostic
+from medical_history.models import (
+    Appointment,
+    Patient,
+    PatientAttachmentData,
+    PatientTreatment,
+    DiseaseType,
+    Treatment,
+    TreatmentCategory,
+    SymptomGroup,
+    Symptom,
+    TreatmentMachine,
+    TreatmentMode,
+    PatientDiagnostic,
+    MedicalAppointmentImage,
+    DiseaseCategory,
+)
 from users.serializers import UserSerializer
+
+
+class DiseaseCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DiseaseCategory
+        fields = "__all__"
 
 
 class DiseaseTypeSerializer(serializers.ModelSerializer):
@@ -14,19 +34,34 @@ class DiseaseTypeSerializer(serializers.ModelSerializer):
 class PatientAttachmentDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = PatientAttachmentData
-        fields = ("description", "link", "name", "id")
+        fields = ("description", "attachment", "name", "id")
 
 
 class PatientDiagnosticSerializer(serializers.ModelSerializer):
     class Meta:
         model = PatientDiagnostic
-        fields = ("diagnostic_date", "disease_type", "description", "disease_stage", "disease_aggressiveness", "id")
+        fields = (
+            "diagnostic_date",
+            "disease_type",
+            "description",
+            "disease_stage",
+            "disease_aggressiveness",
+            "id",
+        )
 
 
 class PatientTreatmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = PatientTreatment
-        fields = ("start_date", "end_date", "treatment", "machine", "mode", "success", "id")
+        fields = (
+            "start_date",
+            "end_date",
+            "treatment",
+            "machine",
+            "mode",
+            "success",
+            "id",
+        )
 
 
 class PatientDetailPatientDiagnosticSerializer(serializers.ModelSerializer):
@@ -38,9 +73,9 @@ class PatientDetailPatientDiagnosticSerializer(serializers.ModelSerializer):
 
 
 class PatientDetailPatientTreatmentSerializer(serializers.ModelSerializer):
-    treatment = serializers.CharField(source='treatment.name')
-    machine = serializers.CharField(source='machine.name')
-    mode = serializers.CharField(source='mode.name')
+    treatment = serializers.CharField(source="treatment.name")
+    machine = serializers.CharField(source="machine.name")
+    mode = serializers.CharField(source="mode.name")
 
     class Meta:
         model = PatientTreatment
@@ -59,11 +94,17 @@ class PatientSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
-        attachments_data = validated_data.pop('attachments')
+        attachments_data = validated_data.pop("attachments")
         patient = Patient.objects.create(**validated_data)
         for attachment in attachments_data:
             PatientAttachmentData.objects.create(patient=patient, **attachment)
         return patient
+
+
+class AppointmentImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MedicalAppointmentImage
+        fields = "__all__"
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
@@ -71,6 +112,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
     patient = PatientSerializer(read_only=True)
     patient_diagnostic = PatientTreatmentSerializer(read_only=True)
     patient_treatment = PatientDiagnosticSerializer(read_only=True)
+    images = AppointmentImageSerializer(many=True)
 
     class Meta:
         model = Appointment
@@ -102,11 +144,19 @@ class TreatmentSerializer(serializers.ModelSerializer):
 
 
 class DetailTreatmentSerializer(serializers.ModelSerializer):
-    category = serializers.CharField(source='category.name', required=False)
+    category = serializers.CharField(source="category.name", required=False)
 
     class Meta:
         model = Treatment
         fields = ("id", "name", "category")
+
+
+class DetailDiseaseTypeSerializer(serializers.ModelSerializer):
+    category = serializers.CharField(source="category.name", required=False)
+
+    class Meta:
+        model = DiseaseType
+        fields = ("id", "name", "code", "description", "category")
 
 
 class SymptomGroupSerializer(serializers.ModelSerializer):
@@ -122,7 +172,7 @@ class SymptomSerializer(serializers.ModelSerializer):
 
 
 class DetailSymptomSerializer(serializers.ModelSerializer):
-    group = serializers.CharField(source='group.name', required=False)
+    group = serializers.CharField(source="group.name", required=False)
 
     class Meta:
         model = Symptom
@@ -131,8 +181,8 @@ class DetailSymptomSerializer(serializers.ModelSerializer):
 
 class DetailPatientTreatmentSerializer(serializers.ModelSerializer):
     treatment = TreatmentSerializer()
-    machine = serializers.CharField(source='machine.name')
-    mode = serializers.CharField(source='mode.name')
+    machine = serializers.CharField(source="machine.name")
+    mode = serializers.CharField(source="mode.name")
 
     class Meta:
         model = PatientTreatment

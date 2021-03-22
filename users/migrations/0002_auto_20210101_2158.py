@@ -6,17 +6,18 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('users', '0001_initial'),
+        ("users", "0001_initial"),
     ]
 
     def generate_superuser(apps, schema_editor):
         from users.models import User, Role
+
         admin_role = Role.objects.create(name="Admin")
         superuser = User.objects.create_superuser(
-            username=os.environ.get('DJANGO_SUPERUSER_USERNAME', 'admin'),
-            email=os.environ.get('DJANGO_SUPERUSER_EMAIL', 'admin@admin.com'),
-            password=os.environ.get('DJANGO_SUPERUSER_PASSWORD', 'admin'),
-            role=admin_role
+            username=os.environ.get("DJANGO_SUPERUSER_USERNAME", "admin"),
+            email=os.environ.get("DJANGO_SUPERUSER_EMAIL", "admin@admin.com"),
+            password=os.environ.get("DJANGO_SUPERUSER_PASSWORD", "admin"),
+            role=admin_role,
         )
         superuser.save()
 

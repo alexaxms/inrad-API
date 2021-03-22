@@ -85,6 +85,26 @@ spec:
                 secretKeyRef:
                   name: inrad-api-secret
                   key: secret_key
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: inrad-api-secret
+                  key: aws_access_key_id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: inrad-api-secret
+                  key: aws_secret_access_key
+            - name: AWS_STORAGE_BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: inrad-api-secret
+                  key: aws_storage_bucket_name
+            - name: AWS_S3_REGION_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: inrad-api-secret
+                  key: aws_s3_region_name
           ports:
             - containerPort: 8000
               name: inrad-api

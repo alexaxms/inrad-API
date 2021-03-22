@@ -13,10 +13,12 @@ class User(AbstractUser):
         ("ADMIN", "Admin"),
     )
     email = models.EmailField(unique=True)
-    user_type = models.CharField(max_length=10, choices=USER_TYPES, default='Employee')
-    role = models.ForeignKey(Role, related_name="users", on_delete=models.CASCADE, null=True)
+    user_type = models.CharField(max_length=10, choices=USER_TYPES, default="Employee")
+    role = models.ForeignKey(
+        Role, related_name="users", on_delete=models.CASCADE, null=True
+    )
 
-    REQUIRED_FIELDS = ('first_name', 'last_name', 'email', 'user_type')
+    REQUIRED_FIELDS = ("first_name", "last_name", "email", "user_type")
 
     @property
     def is_admin(self):
@@ -26,5 +28,5 @@ class User(AbstractUser):
         return {
             "first_name": self.first_name,
             "last_name": self.last_name,
-            "role": self.role.name if self.role else None
+            "role": self.role.name if self.role else None,
         }

@@ -1,7 +1,7 @@
 import os
 
-if 'DJANGO_SETTINGS' in os.environ:
-    if os.environ['DJANGO_SETTINGS'] == "dev":
+if "DJANGO_SETTINGS" in os.environ:
+    if os.environ["DJANGO_SETTINGS"] == "dev":
         try:
             from .local import *
         except ImportError as e:

@@ -10,89 +10,149 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('medical_history', '0001_initial'),
+        ("medical_history", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='treatmentsession',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='treatment_sessions', to=settings.AUTH_USER_MODEL),
+            model_name="treatmentsession",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="treatment_sessions",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='treatment',
-            name='category',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='treatments', to='medical_history.treatmentcategory'),
+            model_name="treatment",
+            name="category",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="treatments",
+                to="medical_history.treatmentcategory",
+            ),
         ),
         migrations.AddField(
-            model_name='symptom',
-            name='diagnostic',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='symptoms', to='medical_history.diagnostic'),
+            model_name="symptom",
+            name="diagnostic",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="symptoms",
+                to="medical_history.diagnostic",
+            ),
         ),
         migrations.AddField(
-            model_name='symptom',
-            name='group',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='symptoms', to='medical_history.symptomgroup'),
+            model_name="symptom",
+            name="group",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="symptoms",
+                to="medical_history.symptomgroup",
+            ),
         ),
         migrations.AddField(
-            model_name='patienttreatment',
-            name='patient',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='medical_history.patient'),
+            model_name="patienttreatment",
+            name="patient",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="medical_history.patient",
+            ),
         ),
         migrations.AddField(
-            model_name='patienttreatment',
-            name='treatment',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='medical_history.treatment'),
+            model_name="patienttreatment",
+            name="treatment",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="medical_history.treatment",
+            ),
         ),
         migrations.AddField(
-            model_name='patientdiagnostic',
-            name='diagnostic',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='medical_history.diagnostic'),
+            model_name="patientdiagnostic",
+            name="diagnostic",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="medical_history.diagnostic",
+            ),
         ),
         migrations.AddField(
-            model_name='patientdiagnostic',
-            name='patient',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='medical_history.patient'),
+            model_name="patientdiagnostic",
+            name="patient",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="medical_history.patient",
+            ),
         ),
         migrations.AddField(
-            model_name='patientattachmentdata',
-            name='patient',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='attachments', to='medical_history.patient'),
+            model_name="patientattachmentdata",
+            name="patient",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="attachments",
+                to="medical_history.patient",
+            ),
         ),
         migrations.AddField(
-            model_name='medicalappointmentimage',
-            name='medical_appointment_summary',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='images', to='medical_history.appointment'),
+            model_name="medicalappointmentimage",
+            name="medical_appointment_summary",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="images",
+                to="medical_history.appointment",
+            ),
         ),
         migrations.AddField(
-            model_name='disease',
-            name='stage',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='diseases', to='medical_history.diseasestage'),
+            model_name="disease",
+            name="stage",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="diseases",
+                to="medical_history.diseasestage",
+            ),
         ),
         migrations.AddField(
-            model_name='disease',
-            name='type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='diseases', to='medical_history.diseasetype'),
+            model_name="disease",
+            name="type",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="diseases",
+                to="medical_history.diseasetype",
+            ),
         ),
         migrations.AddField(
-            model_name='appointment',
-            name='patient',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='appointments', to='medical_history.patient'),
+            model_name="appointment",
+            name="patient",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="appointments",
+                to="medical_history.patient",
+            ),
         ),
         migrations.AddField(
-            model_name='appointment',
-            name='patient_diagnostic',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='medical_history.patientdiagnostic'),
+            model_name="appointment",
+            name="patient_diagnostic",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="medical_history.patientdiagnostic",
+            ),
         ),
         migrations.AddField(
-            model_name='appointment',
-            name='patient_treatment',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='medical_history.patienttreatment'),
+            model_name="appointment",
+            name="patient_treatment",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="medical_history.patienttreatment",
+            ),
         ),
         migrations.AddField(
-            model_name='appointment',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='appointments', to=settings.AUTH_USER_MODEL),
+            model_name="appointment",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="appointments",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

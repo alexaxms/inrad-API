@@ -1,7 +1,17 @@
 from django.contrib import admin
 
-from medical_history.models import Treatment, Appointment, MedicalAppointmentImage, PatientTreatment, \
-    PatientDiagnostic, Patient, PatientAttachmentData, SymptomGroup, Symptom, DiseaseType
+from medical_history.models import (
+    Treatment,
+    Appointment,
+    MedicalAppointmentImage,
+    PatientTreatment,
+    PatientDiagnostic,
+    Patient,
+    PatientAttachmentData,
+    SymptomGroup,
+    Symptom,
+    DiseaseType,
+)
 
 admin.site.register(Treatment)
 admin.site.register(Appointment)
