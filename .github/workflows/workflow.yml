@@ -8,7 +8,7 @@ on:
     
 jobs:
   build:
-    name: Build, push, and deploy
+    name: Build and push
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -25,19 +25,33 @@ jobs:
       - name: Docker push
         run: docker push alexaxms/inrad-api:$(echo $GITHUB_SHA | head -c7)
 
-      - name: Install doctl
-        uses: digitalocean/action-doctl@v2
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
         with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          repository: alexaxms/inrad-api-infra
+          token: ${{ secrets.GH_TOKEN }}
 
-      - name: Update deployment file
-        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|alexaxms/inrad-api:'${TAG}'|' $GITHUB_WORKSPACE/k8s/deployment.yml
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v1
+        with:
+          kustomize-version: "3.6.1"
 
-      - name: Save DigitalOcean kubeconfig with short-lived credentials
-        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 inrad
+      - name: Update Kubernetes resources
+        run: cd ./prod && kustomize edit set image alexaxms/inrad-api:$(echo $GITHUB_SHA | head -c7)
 
-      - name: Deploy to DigitalOcean Kubernetes
-        run: kubectl apply -f $GITHUB_WORKSPACE/k8s/deployment.yml
-
-      - name: Verify deployment
-        run: kubectl rollout status deployment/inrad-api
+      - name: Commit files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -am "Publish new version $(echo $GITHUB_SHA | head -c7)"
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+          repository: alexaxms/inrad-api-infra
