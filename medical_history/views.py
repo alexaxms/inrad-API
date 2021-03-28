@@ -38,6 +38,7 @@ from medical_history.serializers import (
     PatientDetailPatientDiagnosticSerializer,
     DiseaseCategorySerializer,
     DetailDiseaseTypeSerializer,
+    DetailTreatmentSerializer,
 )
 
 
@@ -138,7 +139,7 @@ class TreatmentViewSet(
 
     def get_serializer_class(self):
         if self.action == "retrieve" or self.action == "list":
-            return DetailDiseaseTypeSerializer
+            return DetailTreatmentSerializer
         return TreatmentSerializer
 
 
