@@ -1,4 +1,6 @@
 from django.http import Http404
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from rest_framework import mixins
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
@@ -24,7 +26,6 @@ from medical_history.serializers import (
     DiseaseTypeSerializer,
     TreatmentSerializer,
     TreatmentCategorySerializer,
-    DetailTreatmentSerializer,
     SymptomGroupSerializer,
     SymptomSerializer,
     DetailSymptomSerializer,
@@ -99,6 +100,10 @@ class DiseaseTypeViewSet(
             return DetailDiseaseTypeSerializer
         return DiseaseTypeSerializer
 
+    @method_decorator(cache_page(60 * 60 * 24))
+    def list(self, request, *args, **kwargs):
+        return super().list(self, request, *args, **kwargs)
+
 
 class DiseaseCategoryViewSet(
     mixins.ListModelMixin,
@@ -112,6 +117,10 @@ class DiseaseCategoryViewSet(
     serializer_class = DiseaseCategorySerializer
     filterset_fields = ["name"]
     permission_classes = (IsAuthenticated,)
+
+    @method_decorator(cache_page(60 * 60 * 24))
+    def list(self, request, *args, **kwargs):
+        return super().list(self, request, *args, **kwargs)
 
 
 class TreatmentViewSet(
