@@ -15,6 +15,7 @@ from medical_history.models import (
     PatientDiagnostic,
     MedicalAppointmentImage,
     DiseaseCategory,
+    MedicalAppointmentSymptom,
 )
 from users.serializers import UserSerializer
 
@@ -107,12 +108,21 @@ class DetailAppointmentImageSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class DetailAppointmentSymptomSerializer(serializers.ModelSerializer):
+    symptom = serializers.CharField(source="symptom.name")
+
+    class Meta:
+        model = MedicalAppointmentSymptom
+        fields = ("id", "symptom")
+
+
 class DetailAppointmentSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     patient = PatientSerializer(read_only=True)
     patient_diagnostic = PatientDiagnosticSerializer(read_only=True)
     patient_treatment = PatientTreatmentSerializer(read_only=True)
     images = DetailAppointmentImageSerializer(many=True)
+    symptoms = DetailAppointmentSymptomSerializer(many=True)
 
     class Meta:
         model = Appointment
@@ -204,3 +214,9 @@ class DetailPatientTreatmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = PatientTreatment
         fields = "__all__"
+
+
+class AppointmentSymptomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MedicalAppointmentSymptom
+        fields = ("id", "symptom")

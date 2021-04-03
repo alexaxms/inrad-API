@@ -241,7 +241,7 @@ class MedicalAppointmentImage(models.Model):
 
 class MedicalAppointmentSymptom(models.Model):
     symptom = models.ForeignKey(
-        Appointment, related_name="appointments", on_delete=models.DO_NOTHING
+        Symptom, related_name="appointments", on_delete=models.DO_NOTHING
     )
     appointment = models.ForeignKey(
         Appointment, related_name="symptoms", on_delete=models.DO_NOTHING
