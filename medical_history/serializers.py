@@ -110,8 +110,8 @@ class DetailAppointmentImageSerializer(serializers.ModelSerializer):
 class DetailAppointmentSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     patient = PatientSerializer(read_only=True)
-    patient_diagnostic = PatientTreatmentSerializer(read_only=True)
-    patient_treatment = PatientDiagnosticSerializer(read_only=True)
+    patient_diagnostic = PatientDiagnosticSerializer(read_only=True)
+    patient_treatment = PatientTreatmentSerializer(read_only=True)
     images = DetailAppointmentImageSerializer(many=True)
 
     class Meta:
@@ -128,8 +128,8 @@ class AppointmentImageSerializer(serializers.ModelSerializer):
 class AppointmentSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     patient = PatientSerializer(read_only=True)
-    patient_diagnostic = PatientTreatmentSerializer(read_only=True)
-    patient_treatment = PatientDiagnosticSerializer(read_only=True)
+    patient_diagnostic = PatientDiagnosticSerializer(read_only=True)
+    patient_treatment = PatientTreatmentSerializer(read_only=True)
 
     class Meta:
         model = Appointment
