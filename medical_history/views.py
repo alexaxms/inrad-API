@@ -19,6 +19,7 @@ from medical_history.models import (
     PatientTreatment,
     PatientAttachmentData,
     DiseaseCategory,
+    MedicalAppointmentImage,
 )
 from medical_history.serializers import (
     AppointmentSerializer,
@@ -39,6 +40,8 @@ from medical_history.serializers import (
     DiseaseCategorySerializer,
     DetailDiseaseTypeSerializer,
     DetailTreatmentSerializer,
+    DetailAppointmentSerializer,
+    AppointmentImageSerializer,
 )
 
 
@@ -52,6 +55,11 @@ class AppointmentViewSet(
 ):
     serializer_class = AppointmentSerializer
     filterset_fields = ["user_id"]
+
+    def get_serializer_class(self):
+        if self.action == "retrieve" or self.action == "list":
+            return DetailAppointmentSerializer
+        return AppointmentSerializer
 
     def get_queryset(self):
         try:
@@ -217,6 +225,19 @@ class SymptomViewSet(
         return SymptomSerializer
 
 
+class SymptomByGroupViewSet(
+    mixins.ListModelMixin,
+    GenericViewSet,
+):
+    serializer_class = DetailSymptomSerializer
+    filterset_fields = ["name"]
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        symptoms = Symptom.objects.filter(group_id=self.kwargs["symptom_group_pk"])
+        return symptoms.all()
+
+
 class PatientDiagnosticViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
@@ -286,3 +307,25 @@ class PatientAttachmentDataViewSet(
 
     def perform_create(self, serializer):
         serializer.save(patient_id=self.kwargs["patient_pk"])
+
+
+class PatientAppointmentImageViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    GenericViewSet,
+):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = AppointmentImageSerializer
+
+    def get_queryset(self):
+        images = MedicalAppointmentImage.objects.filter(
+            appointment_id=self.kwargs["appointment_pk"],
+            appointment__patient=self.kwargs["patient_pk"],
+        )
+        return images.all()
+
+    def perform_create(self, serializer):
+        serializer.save(appointment_id=self.kwargs["appointment_pk"])

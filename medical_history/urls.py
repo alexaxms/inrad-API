@@ -15,6 +15,8 @@ from medical_history.views import (
     PatientTreatmentViewSet,
     PatientAttachmentDataViewSet,
     DiseaseCategoryViewSet,
+    SymptomByGroupViewSet,
+    PatientAppointmentImageViewSet,
 )
 
 router = routers.SimpleRouter()
@@ -29,6 +31,9 @@ router.register("symptom_groups", SymptomGroupViewSet)
 router.register("symptoms", SymptomViewSet)
 
 patient_router = routers.NestedSimpleRouter(router, r"patients", lookup="patient")
+symptom_group_router = routers.NestedSimpleRouter(
+    router, r"symptom_groups", lookup="symptom_group"
+)
 
 patient_router.register(
     r"appointments", AppointmentViewSet, basename="patient-appointments"
@@ -46,7 +51,21 @@ patient_router.register(
     r"attachments", PatientAttachmentDataViewSet, basename="patient-attachments"
 )
 
+symptom_group_router.register(
+    r"symptoms", SymptomByGroupViewSet, basename="symptoms-by-group"
+)
+
+appointment_router = routers.NestedSimpleRouter(
+    patient_router, r"appointments", lookup="appointment"
+)
+
+appointment_router.register(
+    r"images", PatientAppointmentImageViewSet, basename="patient-appointment-images"
+)
+
 urlpatterns = [
     path("", include(router.urls)),
     path("", include(patient_router.urls)),
+    path("", include(symptom_group_router.urls)),
+    path("", include(appointment_router.urls)),
 ]

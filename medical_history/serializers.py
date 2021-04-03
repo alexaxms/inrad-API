@@ -101,10 +101,28 @@ class PatientSerializer(serializers.ModelSerializer):
         return patient
 
 
-class AppointmentImageSerializer(serializers.ModelSerializer):
+class DetailAppointmentImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = MedicalAppointmentImage
         fields = "__all__"
+
+
+class DetailAppointmentSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    patient = PatientSerializer(read_only=True)
+    patient_diagnostic = PatientTreatmentSerializer(read_only=True)
+    patient_treatment = PatientDiagnosticSerializer(read_only=True)
+    images = DetailAppointmentImageSerializer(many=True)
+
+    class Meta:
+        model = Appointment
+        fields = "__all__"
+
+
+class AppointmentImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MedicalAppointmentImage
+        fields = ("id", "name", "description", "image")
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
@@ -112,7 +130,6 @@ class AppointmentSerializer(serializers.ModelSerializer):
     patient = PatientSerializer(read_only=True)
     patient_diagnostic = PatientTreatmentSerializer(read_only=True)
     patient_treatment = PatientDiagnosticSerializer(read_only=True)
-    images = AppointmentImageSerializer(many=True)
 
     class Meta:
         model = Appointment

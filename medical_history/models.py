@@ -18,7 +18,6 @@ class Patient(models.Model):
     phone_number = models.CharField(max_length=255)
     gender = models.CharField(max_length=20, choices=GENDER)
     age = models.IntegerField()
-    blood_type = models.CharField(max_length=4)
 
     def __str__(self):
         return self.name
@@ -31,7 +30,6 @@ class Patient(models.Model):
             "gender": self.gender,
             "identifier": self.identifier,
             "age": self.age,
-            "blood_type": self.blood_type,
             "attachments": [
                 attachment.to_dict() for attachment in self.attachments.all()
             ],
@@ -233,9 +231,18 @@ class MedicalAppointmentImage(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     image = models.FileField()
-    medical_appointment_summary = models.ForeignKey(
+    appointment = models.ForeignKey(
         Appointment, related_name="images", on_delete=models.CASCADE
     )
 
     def __str__(self):
         return self.name
+
+
+class MedicalAppointmentSymptom(models.Model):
+    symptom = models.ForeignKey(
+        Appointment, related_name="appointments", on_delete=models.DO_NOTHING
+    )
+    appointment = models.ForeignKey(
+        Appointment, related_name="symptoms", on_delete=models.DO_NOTHING
+    )

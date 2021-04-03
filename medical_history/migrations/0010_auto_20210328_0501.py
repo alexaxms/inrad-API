@@ -8,16 +8,17 @@ def initial_disease_categories(apps, schema_editor):
     from medical_history.models import DiseaseCategory
 
     import os
+
     workpath = os.path.dirname(os.path.abspath(__file__))
-    c = open(os.path.join(workpath, '../../categories.csv'))
-    csv_reader = csv.reader(c, delimiter=',')
+    c = open(os.path.join(workpath, "../../categories.csv"))
+    csv_reader = csv.reader(c, delimiter=",")
     for row in csv_reader:
         DiseaseCategory.objects.create(code=row[0], name=row[1])
 
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('medical_history', '0009_auto_20210321_1813'),
+        ("medical_history", "0009_auto_20210321_1813"),
     ]
 
     operations = [
