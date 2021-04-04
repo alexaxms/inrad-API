@@ -7,6 +7,11 @@ from django.db import models
 from users.models import User
 
 
+class HealthFacility(models.Model):
+    name = models.CharField(max_length=100)
+    address = models.CharField(max_length=100)
+
+
 class Patient(models.Model):
     GENDER = (
         ("Masculino", "Masculino"),
@@ -18,6 +23,12 @@ class Patient(models.Model):
     phone_number = models.CharField(max_length=255)
     gender = models.CharField(max_length=20, choices=GENDER)
     age = models.IntegerField()
+    health_facility = models.ForeignKey(
+        HealthFacility,
+        related_name="derived_patients",
+        null=True,
+        on_delete=models.DO_NOTHING,
+    )
 
     def __str__(self):
         return self.name
@@ -178,6 +189,7 @@ class PatientDiagnostic(models.Model):
 
 class Appointment(models.Model):
     summary = models.TextField()
+    date = models.DateField()
     user = models.ForeignKey(
         User, related_name="appointments", on_delete=models.DO_NOTHING
     )

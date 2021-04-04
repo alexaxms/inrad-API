@@ -21,6 +21,7 @@ from medical_history.models import (
     DiseaseCategory,
     MedicalAppointmentImage,
     MedicalAppointmentSymptom,
+    HealthFacility,
 )
 from medical_history.serializers import (
     AppointmentSerializer,
@@ -44,6 +45,7 @@ from medical_history.serializers import (
     DetailAppointmentSerializer,
     AppointmentImageSerializer,
     AppointmentSymptomSerializer,
+    HealthFacilitySerializer,
 )
 
 
@@ -353,3 +355,16 @@ class PatientAppointmentSymptomViewSet(
 
     def perform_create(self, serializer):
         serializer.save(appointment_id=self.kwargs["appointment_pk"])
+
+
+class HealthFacilityViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    GenericViewSet,
+):
+    queryset = HealthFacility.objects.all()
+    serializer_class = HealthFacilitySerializer
+    permission_classes = (IsAuthenticated,)

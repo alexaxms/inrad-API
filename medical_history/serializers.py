@@ -16,6 +16,7 @@ from medical_history.models import (
     MedicalAppointmentImage,
     DiseaseCategory,
     MedicalAppointmentSymptom,
+    HealthFacility,
 )
 from users.serializers import UserSerializer
 
@@ -220,3 +221,9 @@ class AppointmentSymptomSerializer(serializers.ModelSerializer):
     class Meta:
         model = MedicalAppointmentSymptom
         fields = ("id", "symptom")
+
+
+class HealthFacilitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HealthFacility
+        fields = "__all__"

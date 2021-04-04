@@ -17,10 +17,11 @@ from medical_history.views import (
     DiseaseCategoryViewSet,
     SymptomByGroupViewSet,
     PatientAppointmentImageViewSet,
-    PatientAppointmentSymptomViewSet,
+    PatientAppointmentSymptomViewSet, HealthFacilityViewSet,
 )
 
 router = routers.SimpleRouter()
+router.register("health_facilities", HealthFacilityViewSet)
 router.register("patients", PatientViewSet)
 router.register("disease_categories", DiseaseCategoryViewSet)
 router.register("disease_types", DiseaseTypeViewSet)
