@@ -143,7 +143,7 @@ class DiseaseCategory(models.Model):
 class DiseaseType(models.Model):
     name = models.CharField(max_length=255)
     code = models.CharField(max_length=255)
-    description = models.CharField(max_length=255, null=True)
+    description = models.TextField()
     category = models.ForeignKey(
         DiseaseCategory, related_name="diseases", on_delete=models.CASCADE
     )
@@ -189,7 +189,7 @@ class PatientDiagnostic(models.Model):
     disease_type = models.ForeignKey(
         DiseaseType, related_name="diagnostics", on_delete=models.CASCADE
     )
-    description = models.CharField(max_length=255, null=True)
+    description = models.TextField()
     disease_stage = models.IntegerField()
     disease_aggressiveness = models.IntegerField()
 
