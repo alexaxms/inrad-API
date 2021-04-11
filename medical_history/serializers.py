@@ -17,6 +17,7 @@ from medical_history.models import (
     DiseaseCategory,
     MedicalAppointmentSymptom,
     HealthFacility,
+    MedicalForecast,
 )
 from users.serializers import UserSerializer
 
@@ -84,23 +85,34 @@ class PatientDetailPatientTreatmentSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class PatientSerializer(serializers.ModelSerializer):
+class PatientBaseSerializer(serializers.ModelSerializer):
     attachments = PatientAttachmentDataSerializer(many=True)
-    diagnostics = PatientDetailPatientDiagnosticSerializer(many=True, read_only=True)
-    treatments = PatientDetailPatientTreatmentSerializer(many=True, read_only=True)
-    current_treatment = PatientDetailPatientTreatmentSerializer(read_only=True)
-    current_diagnostic = PatientDetailPatientDiagnosticSerializer(read_only=True)
 
     class Meta:
         model = Patient
         fields = "__all__"
 
+
+class PatientSerializer(PatientBaseSerializer):
     def create(self, validated_data):
         attachments_data = validated_data.pop("attachments")
         patient = Patient.objects.create(**validated_data)
         for attachment in attachments_data:
             PatientAttachmentData.objects.create(patient=patient, **attachment)
         return patient
+
+
+class DetailPatientSerializer(PatientBaseSerializer):
+    diagnostics = PatientDetailPatientDiagnosticSerializer(many=True, read_only=True)
+    treatments = PatientDetailPatientTreatmentSerializer(many=True, read_only=True)
+    current_treatment = PatientDetailPatientTreatmentSerializer(read_only=True)
+    current_diagnostic = PatientDetailPatientDiagnosticSerializer(read_only=True)
+    health_facility = serializers.CharField(
+        source="health_facility.name", required=False
+    )
+    medical_forecast = serializers.CharField(
+        source="medical_forecast.name", required=False
+    )
 
 
 class DetailAppointmentImageSerializer(serializers.ModelSerializer):
@@ -226,4 +238,10 @@ class AppointmentSymptomSerializer(serializers.ModelSerializer):
 class HealthFacilitySerializer(serializers.ModelSerializer):
     class Meta:
         model = HealthFacility
+        fields = "__all__"
+
+
+class MedicalForecastSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MedicalForecast
         fields = "__all__"

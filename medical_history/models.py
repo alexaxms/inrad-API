@@ -7,6 +7,10 @@ from django.db import models
 from users.models import User
 
 
+class MedicalForecast(models.Model):
+    name = models.CharField(max_length=100)
+
+
 class HealthFacility(models.Model):
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=100)
@@ -22,10 +26,16 @@ class Patient(models.Model):
     last_name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=255)
     gender = models.CharField(max_length=20, choices=GENDER)
-    age = models.IntegerField()
+    birth_date = models.DateField()
     health_facility = models.ForeignKey(
         HealthFacility,
         related_name="derived_patients",
+        null=True,
+        on_delete=models.DO_NOTHING,
+    )
+    medical_forecast = models.ForeignKey(
+        MedicalForecast,
+        related_name="related_patients",
         null=True,
         on_delete=models.DO_NOTHING,
     )
@@ -40,7 +50,7 @@ class Patient(models.Model):
             "phone_number": self.phone_number,
             "gender": self.gender,
             "identifier": self.identifier,
-            "age": self.age,
+            "birth_date": self.birth_date,
             "attachments": [
                 attachment.to_dict() for attachment in self.attachments.all()
             ],

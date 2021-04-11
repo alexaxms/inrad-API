@@ -22,6 +22,7 @@ from medical_history.models import (
     MedicalAppointmentImage,
     MedicalAppointmentSymptom,
     HealthFacility,
+    MedicalForecast,
 )
 from medical_history.serializers import (
     AppointmentSerializer,
@@ -46,6 +47,8 @@ from medical_history.serializers import (
     AppointmentImageSerializer,
     AppointmentSymptomSerializer,
     HealthFacilitySerializer,
+    MedicalForecastSerializer,
+    DetailPatientSerializer,
 )
 
 
@@ -93,8 +96,12 @@ class PatientViewSet(
     GenericViewSet,
 ):
     queryset = Patient.objects.all()
-    serializer_class = PatientSerializer
     permission_classes = (IsAuthenticated,)
+
+    def get_serializer_class(self):
+        if self.action == "retrieve" or self.action == "list":
+            return DetailPatientSerializer
+        return PatientSerializer
 
 
 class DiseaseTypeViewSet(
@@ -367,4 +374,17 @@ class HealthFacilityViewSet(
 ):
     queryset = HealthFacility.objects.all()
     serializer_class = HealthFacilitySerializer
+    permission_classes = (IsAuthenticated,)
+
+
+class MedicalForecastViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    GenericViewSet,
+):
+    queryset = MedicalForecast.objects.all()
+    serializer_class = MedicalForecastSerializer
     permission_classes = (IsAuthenticated,)
