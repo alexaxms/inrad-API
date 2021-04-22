@@ -19,13 +19,13 @@ spec:
         tier: backend
     spec:
       containers:
-        - image: alexaxms/inrad-api:latest
+        - image: alexaxms/inrad-api:<IMAGE>
           name: inrad-api
           envFrom:
           - secretRef:
-            name: inrad-api-secret
+              name: inrad-api-secret
           - configMapRef:
-            name: inrad-api
+              name: inrad-api
           ports:
             - containerPort: 8000
               name: inrad-api
