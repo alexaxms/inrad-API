@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: inrad-ingress
+  namespace: inrad
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    acme.cert-manager.io/http01-edit-in-place: "true"
+spec:
+  tls:
+    - hosts:
+        - inrad-api.musicmania.cl
+      secretName: inrad-tls
+  rules:
+    - host: inrad-api.musicmania.cl
+      http:
+        paths:
+          - backend:
+              serviceName: inrad-api
+              servicePort: 80

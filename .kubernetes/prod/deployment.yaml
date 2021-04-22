@@ -11,7 +11,7 @@ spec:
       app: inrad-api
       tier: backend
   strategy:
-    type: Recreate
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -19,7 +19,7 @@ spec:
         tier: backend
     spec:
       containers:
-        - image: alexaxms/inrad-api:<IMAGE>
+        - image: <IMAGE>
           name: inrad-api
           envFrom:
           - secretRef:
